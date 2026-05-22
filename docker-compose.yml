@@ -3,7 +3,5 @@ services:
     image: postgres:17.4
     ports: 
       - "5433:5432"
-    environment:
-      POSTGRES_USER: aditya
-      POSTGRES_PASSWORD: aditya@123
-      POSTGRES_DB: blogdb
+    env_files:
+      - .env
