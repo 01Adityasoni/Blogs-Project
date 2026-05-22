@@ -6,6 +6,8 @@ const { blogs } = require("../models/blogs");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const { resolveCoverImageURL } = require("../utils/coverImage");
+const { users } = require("../models/user");
 
 const uploadDir = path.join(__dirname, "..", "public", "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -18,7 +20,17 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const ext = path.extname(file.originalname) || '';
-        const name = `${file.fieldname}-${Date.now()}${ext}`;
+        const mimeExtensionMap = {
+            "image/jpeg": ".jpg",
+            "image/jpg": ".jpg",
+            "image/png": ".png",
+            "image/gif": ".gif",
+            "image/webp": ".webp",
+            "image/bmp": ".bmp",
+            "image/svg+xml": ".svg",
+        };
+        const inferredExt = ext || mimeExtensionMap[file.mimetype] || "";
+        const name = `${file.fieldname}-${Date.now()}${inferredExt}`;
         cb(null, name);
     }
 });
@@ -28,7 +40,8 @@ const upload = multer({ storage });
 
 router.get("/add-new", (req, res) => {
     return res.render("addBlog",{
-        user: req.user
+        user: req.user,
+        errorMessage: req.query.error || ""
     });
 });
 
@@ -41,8 +54,16 @@ router.post("/add", upload.single("coverImage"), async (req, res) => {
         console.log("POST /blogs/add headers:", req.headers);
         console.log("POST /blogs/add body:", req.body);
         console.log("POST /blogs/add file:", req.file);
+        if (req.file && !req.file.mimetype.startsWith("image/")) {
+            try {
+                fs.unlinkSync(req.file.path);
+            } catch (unlinkError) {
+                console.error("Failed to remove non-image upload:", unlinkError);
+            }
+            return res.redirect("/blogs/add-new?error=" + encodeURIComponent("Please upload an image file for the cover image."));
+        }
         if (!title || !content) {
-            return res.redirect("/blogs/add-new");
+            return res.redirect("/blogs/add-new?error=" + encodeURIComponent("Title and content are required."));
         }
 
         const coverImageURL = req.file ? `/uploads/${req.file.filename}` : undefined;
@@ -67,9 +88,25 @@ router.get("/view", async (req, res) => {
     if (!title) return res.redirect("/");
     const { eq } = require("drizzle-orm");
     const { comments } = require("../models/comment");
-    const matched = await db.select().from(blogs).where(eq(blogs.title, title)).limit(1);
+    const matched = await db
+        .select({
+            title: blogs.title,
+            body: blogs.body,
+            createdBy: blogs.createdBy,
+            timestamp: blogs.timestamp,
+            authorFullName: users.fullName,
+            authorProfileImageURL: users.profileImageURL,
+            coverImageURL: blogs.coverImageURL,
+        })
+        .from(blogs)
+        .innerJoin(users, eq(blogs.createdBy, users.email))
+        .where(eq(blogs.title, title))
+        .limit(1);
     if (!matched || matched.length === 0) return res.redirect("/");
-    const blog = matched[0];
+    const blog = {
+        ...matched[0],
+        resolvedCoverImageURL: resolveCoverImageURL(matched[0].coverImageURL),
+    };
     let blogComments = [];
     try {
         blogComments = await db.select().from(comments).where(eq(comments.blogTitle, title)).orderBy(comments.timestamp);

@@ -14,14 +14,15 @@
                 <% blogs.forEach(function(blog){ %>
                     <div class="col-md-4 mb-3">
                         <div class="card h-100">
-                            <% if (blog.coverImageURL) { %>
-                                <img src="<%= blog.coverImageURL %>" class="card-img-top" alt="cover">
-                            <% } %>
+                            <img src="<%= blog.coverImageURL || blog.resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="card-img-top" alt="cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
                             <div class="card-body">
                                 <h5 class="card-title"><%= blog.title %></h5>
                                 <p class="card-text"><%= (blog.body && blog.body.length > 200) ? blog.body.substring(0,200) + '...' : blog.body %></p>
                             </div>
-                            <div class="card-footer text-muted">By <%= blog.createdBy %></div>
+                            <div class="card-footer d-flex align-items-center gap-2 text-muted">
+                                <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                                <span>Created by <%= blog.authorFullName || blog.createdBy %></span>
+                            </div>
                             <a href="/blogs/view?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-primary">Read</a>
                         </div>
                     </div>

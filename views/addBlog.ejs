@@ -8,10 +8,13 @@
     <%- include('./partials/nav') %>
     <div class="container mt-4">
         <h2>Add a New Blog Post</h2>
+        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+            <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
+        <% } %>
         <form action="/blogs/add" method="POST" enctype="multipart/form-data">
              <div class="mb-3">
                 <label for="coverImage" class="form-label">Cover Image</label>
-                <input type="file" class="form-control" id="coverImage" name="coverImage" required>
+                <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*" required>
             </div>
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>

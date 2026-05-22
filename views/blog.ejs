@@ -12,10 +12,13 @@
             <div class="row">
                 <div class="col-md-12">
                     <h1><%= blog.title %></h1>
-                    <% if (blog.coverImageURL) { %>
-                        <img src="<%= blog.coverImageURL %>" class="img-fluid mb-3" alt="cover">
-                    <% } %>
-                    <p class="lead">By <%= blog.createdBy %></p>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle" style="width:64px;height:64px;object-fit:cover;">
+                        <div>
+                            <p class="lead mb-0">By <%= blog.authorFullName || blog.createdBy %></p>
+                            <small class="text-muted"><%= blog.createdBy %></small>
+                        </div>
+                    </div>
                     <div><%= blog.body %></div>
                 </div>
             </div>
