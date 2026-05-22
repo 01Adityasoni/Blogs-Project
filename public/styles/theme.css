@@ -107,6 +107,29 @@ a:hover {
   padding: 3rem 0 4rem;
 }
 
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 18px 50px rgba(2, 6, 23, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 22px 68px rgba(139, 92, 246, 0.22);
+  }
+}
+
 .hero-panel,
 .surface-card,
 .form-panel,
@@ -121,6 +144,82 @@ a:hover {
 
 .hero-panel {
   padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: floatUp 500ms ease both;
+}
+
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  inset: auto -8% -40% auto;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.15), transparent 68%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.metric-tile {
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metric-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.spotlight-card {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, rgba(19, 27, 46, 0.98), rgba(10, 14, 26, 0.98));
+  border: 1px solid var(--border);
+  animation: floatUp 600ms ease both;
+}
+
+.spotlight-card:hover {
+  animation: pulseGlow 2.8s ease-in-out infinite;
+}
+
+.spotlight-cover {
+  aspect-ratio: 16 / 12;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.spotlight-copy {
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
 }
 
 .hero-badge,
@@ -174,6 +273,7 @@ a:hover {
   overflow: hidden;
   box-shadow: 0 18px 50px rgba(2, 6, 23, 0.35);
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  animation: floatUp 520ms ease both;
 }
 
 .blog-card:hover,
@@ -181,6 +281,16 @@ a:hover {
   transform: translateY(-4px);
   border-color: rgba(139, 92, 246, 0.4);
   box-shadow: 0 26px 70px rgba(2, 6, 23, 0.45);
+}
+
+.blog-card:nth-child(2n),
+.auth-card:nth-child(2n) {
+  animation-delay: 80ms;
+}
+
+.blog-card:nth-child(3n),
+.auth-card:nth-child(3n) {
+  animation-delay: 140ms;
 }
 
 .blog-cover {

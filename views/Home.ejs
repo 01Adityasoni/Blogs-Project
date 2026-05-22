@@ -12,22 +12,72 @@
         <div class="container">
             <section class="hero-panel mb-4">
                 <div class="row align-items-end g-4">
-                    <div class="col-lg-8">
+                    <div class="col-lg-7">
                         <span class="hero-badge">Dark mode storytelling</span>
                         <h1 class="hero-title"><%= user ? `Welcome back, ${user.fullName || user.email}` : 'Build a blog that feels premium' %></h1>
                         <p class="hero-copy mb-0">A glossy dark interface for reading, writing, and sharing posts without the usual plain Bootstrap look.</p>
+
+                        <div class="hero-actions">
+                            <% if (user) { %>
+                                <a href="/blogs/add-new" class="btn btn-primary px-4 py-2">Write a post</a>
+                            <% } %>
+                            <a href="#latest-posts" class="btn btn-outline-light px-4 py-2">Browse posts</a>
+                        </div>
+
+                        <div class="hero-metrics">
+                            <div class="metric-tile">
+                                <div class="metric-value"><%= blogs ? blogs.length : 0 %></div>
+                                <div class="metric-label">Published posts</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="metric-value">Dark</div>
+                                <div class="metric-label">Theme first</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="metric-value">Fast</div>
+                                <div class="metric-label">Reading flow</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <div class="surface-card d-inline-block text-start">
-                            <div class="section-badge mb-2">Quick glance</div>
-                            <div class="section-title h3 mb-1"><%= blogs ? blogs.length : 0 %> posts</div>
-                            <div class="muted-copy">Curated cards, soft glow accents, and better contrast for long sessions.</div>
+                    <div class="col-lg-5">
+                        <div class="spotlight-card">
+                            <div class="d-flex align-items-center justify-content-between gap-3">
+                                <div>
+                                    <div class="section-badge mb-2">Spotlight</div>
+                                    <div class="section-title h4 mb-0"><%= blogs && blogs.length ? 'Latest story' : 'No featured story' %></div>
+                                </div>
+                                <small class="blog-meta text-uppercase">Now</small>
+                            </div>
+
+                            <% if (blogs && blogs.length) { %>
+                                <img src="<%= blogs[0].coverImageURL || blogs[0].resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="spotlight-cover w-100" alt="featured cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
+                                <div>
+                                    <h2 class="blog-title h3 mb-2"><%= blogs[0].title %></h2>
+                                    <p class="spotlight-copy mb-3"><%= (blogs[0].body && blogs[0].body.length > 150) ? blogs[0].body.substring(0,150) + '...' : blogs[0].body %></p>
+                                    <div class="d-flex align-items-center justify-content-between gap-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="<%= blogs[0].authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle avatar-sm" onerror="this.onerror=null;this.src='/user avatar img.png'">
+                                            <div>
+                                                <div class="fw-semibold"><%= blogs[0].authorFullName || blogs[0].createdBy %></div>
+                                                <small class="blog-meta">Featured author</small>
+                                            </div>
+                                        </div>
+                                        <a href="/blogs/view?title=<%= encodeURIComponent(blogs[0].title) %>" class="btn btn-primary btn-sm px-3">Read now</a>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="empty-state m-0 h-100 d-grid align-content-center">
+                                    <div class="section-badge mb-3">Quiet feed</div>
+                                    <p class="muted-copy mb-0">Publish the first story to make this space feel alive.</p>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
             </section>
 
             <% if (blogs && blogs.length) { %>
+                <div id="latest-posts"></div>
                 <div class="row blog-grid g-4">
                     <% blogs.forEach(function(blog){ %>
                         <div class="col-md-6 col-xl-4">
