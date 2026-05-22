@@ -5,32 +5,65 @@
     <title>Homepage</title>
 </head>
 <body>
+    <div class="app-shell">
     <%- include('./partials/nav') %>
-    <%= user ? `<h1>Welcome, ${user.fullName || user.email}!</h1>` : '<h1>Welcome to Blogify!</h1>' %>
 
-    <div class="container mt-4">
-        <% if (blogs && blogs.length) { %>
-            <div class="row">
-                <% blogs.forEach(function(blog){ %>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <img src="<%= blog.coverImageURL || blog.resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="card-img-top" alt="cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
-                            <div class="card-body">
-                                <h5 class="card-title"><%= blog.title %></h5>
-                                <p class="card-text"><%= (blog.body && blog.body.length > 200) ? blog.body.substring(0,200) + '...' : blog.body %></p>
-                            </div>
-                            <div class="card-footer d-flex align-items-center gap-2 text-muted">
-                                <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
-                                <span>Created by <%= blog.authorFullName || blog.createdBy %></span>
-                            </div>
-                            <a href="/blogs/view?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-primary">Read</a>
+    <main class="page-shell">
+        <div class="container">
+            <section class="hero-panel mb-4">
+                <div class="row align-items-end g-4">
+                    <div class="col-lg-8">
+                        <span class="hero-badge">Dark mode storytelling</span>
+                        <h1 class="hero-title"><%= user ? `Welcome back, ${user.fullName || user.email}` : 'Build a blog that feels premium' %></h1>
+                        <p class="hero-copy mb-0">A glossy dark interface for reading, writing, and sharing posts without the usual plain Bootstrap look.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="surface-card d-inline-block text-start">
+                            <div class="section-badge mb-2">Quick glance</div>
+                            <div class="section-title h3 mb-1"><%= blogs ? blogs.length : 0 %> posts</div>
+                            <div class="muted-copy">Curated cards, soft glow accents, and better contrast for long sessions.</div>
                         </div>
                     </div>
-                <% }) %>
-            </div>
-        <% } else if (user) { %>
-            <p>No blogs yet.</p>
-        <% } %>
+                </div>
+            </section>
+
+            <% if (blogs && blogs.length) { %>
+                <div class="row blog-grid g-4">
+                    <% blogs.forEach(function(blog){ %>
+                        <div class="col-md-6 col-xl-4">
+                            <article class="blog-card">
+                                <img src="<%= blog.coverImageURL || blog.resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="card-img-top blog-cover" alt="cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                                        <span class="section-badge">Article</span>
+                                        <small class="blog-meta">Blog post</small>
+                                    </div>
+                                    <h2 class="blog-title h4 mb-3"><%= blog.title %></h2>
+                                    <p class="card-text blog-meta mb-0"><%= (blog.body && blog.body.length > 200) ? blog.body.substring(0,200) + '...' : blog.body %></p>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between gap-3 p-4 bg-transparent border-top">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle avatar-sm" onerror="this.onerror=null;this.src='/user avatar img.png'">
+                                        <div>
+                                            <div class="fw-semibold"><%= blog.authorFullName || blog.createdBy %></div>
+                                            <small class="blog-meta">Writer</small>
+                                        </div>
+                                    </div>
+                                    <a href="/blogs/view?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-primary btn-sm px-3">Read</a>
+                                </div>
+                            </article>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else if (user) { %>
+                <div class="empty-state mt-4">
+                    <div class="section-badge mb-3">Empty feed</div>
+                    <h2 class="section-title h3 mb-2">No blogs yet</h2>
+                    <p class="muted-copy mb-0">Be the first to publish something and fill the homepage with your style.</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
     </div>
 
     <%- include('./partials/scripts') %>

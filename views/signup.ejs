@@ -5,28 +5,34 @@
     <title>Signup</title>
 </head>
 <body>
+    <div class="app-shell">
     <%- include('./partials/nav') %>
 
-
-    <div class="container">
-        <h1>Signup</h1>
-        <form action="/user/signup" method="POST">
-            <div class="mb-3">
-                <label for="fullName" class="form-label">Fullname</label>
-                <input type="text" class="form-control" id="fullName" name="fullName" required>
+    <main class="auth-wrapper">
+        <div class="container">
+            <div class="auth-card">
+                <span class="hero-badge mb-3">Create account</span>
+                <h1 class="auth-title h2 mb-2">Join the blog</h1>
+                <p class="form-text mb-4">Set up your profile and start publishing in a polished dark interface.</p>
+                <form action="/user/signup" method="POST">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full name</label>
+                        <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Alex Morgan" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Sign Up</button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Sign Up</button>
-        </form>
-
-
+        </div>
+    </main>
+    </div>
 
     <%- include('./partials/scripts') %>
 </body>

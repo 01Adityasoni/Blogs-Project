@@ -5,27 +5,37 @@
     <title>Add New Blog</title>
 </head>
 <body>
+    <div class="app-shell">
     <%- include('./partials/nav') %>
-    <div class="container mt-4">
-        <h2>Add a New Blog Post</h2>
-        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-            <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
-        <% } %>
-        <form action="/blogs/add" method="POST" enctype="multipart/form-data">
-             <div class="mb-3">
-                <label for="coverImage" class="form-label">Cover Image</label>
-                <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*" required>
+    <main class="page-shell">
+        <div class="container">
+            <div class="form-panel mx-auto" style="max-width: 860px;">
+                <div class="page-heading">
+                    <span class="hero-badge mb-3">New post</span>
+                    <h1 class="section-title h2 mb-2">Add a blog that stands out</h1>
+                    <p class="section-copy mb-0">Use a strong cover image, a focused title, and readable body copy.</p>
+                </div>
+                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                    <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
+                <% } %>
+                <form action="/blogs/add" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="coverImage" class="form-label">Cover Image</label>
+                        <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="A title people want to click" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="8" placeholder="Write something useful, vivid, or memorable" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4 py-2">Publish</button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" required>
-            </div>
-            <div class="mb-3">
-                <label for="content" class="form-label">Content</label>
-                <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        </div>
+    </main>
     </div>
     <%- include('./partials/scripts') %>
 </body>
