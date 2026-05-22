@@ -62,4 +62,35 @@ router.post("/add", upload.single("coverImage"), async (req, res) => {
 });
 
 
+router.get("/view", async (req, res) => {
+    const title = req.query.title;
+    if (!title) return res.redirect("/");
+    const { eq } = require("drizzle-orm");
+    const { comments } = require("../models/comment");
+    const matched = await db.select().from(blogs).where(eq(blogs.title, title)).limit(1);
+    if (!matched || matched.length === 0) return res.redirect("/");
+    const blog = matched[0];
+    let blogComments = [];
+    try {
+        blogComments = await db.select().from(comments).where(eq(comments.blogTitle, title)).orderBy(comments.timestamp);
+    } catch (err) {
+        console.error('Comments query failed, retrying without orderBy:', err);
+        try {
+            blogComments = await db.select().from(comments).where(eq(comments.blogTitle, title));
+        } catch (err2) {
+            console.error('Comments query retry failed:', err2);
+            blogComments = [];
+        }
+    }
+    return res.render("blog", {
+        user: req.user,
+        blog,
+        comments: blogComments,
+    });
+});
+
+router.get("/:blogId", async (req, res) => {
+    return res.redirect('/blogs');
+});
+
 module.exports = router;
