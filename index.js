@@ -9,6 +9,7 @@ const port = process.env.PORT || 3000;
 
 const userRoutes = require("./routes/user")
 const blogsRoutes = require("./routes/blogs")
+const commentsRoutes = require("./routes/comments")
 
 const db = require("./db");
 const { blogs } = require("./models/blogs");    
@@ -46,6 +47,7 @@ app.post("/signup", (req, res) => {
    
 app.use("/user", userRoutes)
 app.use("/blogs", blogsRoutes)
+app.use("/comments", commentsRoutes)
 
 
 

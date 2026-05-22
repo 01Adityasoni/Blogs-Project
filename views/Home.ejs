@@ -22,7 +22,7 @@
                                 <p class="card-text"><%= (blog.body && blog.body.length > 200) ? blog.body.substring(0,200) + '...' : blog.body %></p>
                             </div>
                             <div class="card-footer text-muted">By <%= blog.createdBy %></div>
-                            <a href="/blogs/<%= blog.id %>" class="btn btn-primary">Read</a>
+                            <a href="/blogs/view?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-primary">Read</a>
                         </div>
                     </div>
                 <% }) %>

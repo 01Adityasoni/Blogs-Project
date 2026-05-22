@@ -89,8 +89,12 @@ router.get("/view", async (req, res) => {
     });
 });
 
+router.get("/", (req, res) => {
+    return res.redirect("/");
+});
+
 router.get("/:blogId", async (req, res) => {
-    return res.redirect('/blogs');
+    return res.redirect("/");
 });
 
 module.exports = router;
