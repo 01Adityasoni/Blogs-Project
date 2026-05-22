@@ -8,6 +8,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const userRoutes = require("./routes/user")
+const blogsRoutes = require("./routes/blogs")
+
+const db = require("./db");
+const { blogs } = require("./models/blogs");    
+
 
 app.set("view engine", "ejs");
 app.set("views",path.resolve("./views"));
@@ -17,10 +22,14 @@ app.use(express.static(path.resolve("./public")));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));
 
-
+app.use(express.static(path.resolve("./public")));
  
-app.get("/", (req, res) => {
-    res.render("home", { user: req.user });
+app.get("/", async (req, res) => {
+    let allBlogs = [];
+    if (req.user) {
+        allBlogs = await db.select().from(blogs);
+    }
+    res.render("home", { user: req.user, blogs: allBlogs });
 });
 
 app.get("/signup", (req, res) => {
@@ -36,6 +45,7 @@ app.post("/signup", (req, res) => {
 });
    
 app.use("/user", userRoutes)
+app.use("/blogs", blogsRoutes)
 
 
 

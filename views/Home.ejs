@@ -6,7 +6,32 @@
 </head>
 <body>
     <%- include('./partials/nav') %>
-    <%= user ? `<h1>Welcome, ${user.full_name || user.email}!</h1>` : '<h1>Welcome to Blogify!</h1>' %>
+    <%= user ? `<h1>Welcome, ${user.fullName || user.email}!</h1>` : '<h1>Welcome to Blogify!</h1>' %>
+
+    <div class="container mt-4">
+        <% if (blogs && blogs.length) { %>
+            <div class="row">
+                <% blogs.forEach(function(blog){ %>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <% if (blog.coverImageURL) { %>
+                                <img src="<%= blog.coverImageURL %>" class="card-img-top" alt="cover">
+                            <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title"><%= blog.title %></h5>
+                                <p class="card-text"><%= (blog.body && blog.body.length > 200) ? blog.body.substring(0,200) + '...' : blog.body %></p>
+                            </div>
+                            <div class="card-footer text-muted">By <%= blog.createdBy %></div>
+                            <a href="/blogs/<%= blog.id %>" class="btn btn-primary">Read</a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else if (user) { %>
+            <p>No blogs yet.</p>
+        <% } %>
+    </div>
+
     <%- include('./partials/scripts') %>
 </body>
 </html>
