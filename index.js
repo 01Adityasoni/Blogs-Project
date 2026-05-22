@@ -1,6 +1,8 @@
 require("dotenv/config");
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const { checkForAuthenticationCookie } = require("./middlewares/authentication");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,11 +14,13 @@ app.set("views",path.resolve("./views"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.resolve("./public")));
+app.use(cookieParser());
+app.use(checkForAuthenticationCookie("token"));
 
 
  
 app.get("/", (req, res) => {
-    res.render("home");
+    res.render("home", { user: req.user });
 });
 
 app.get("/signup", (req, res) => {

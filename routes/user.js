@@ -4,10 +4,11 @@ const { createHmac, randomBytes } = require("crypto");
 const { eq } = require("drizzle-orm");
 const db = require("../db");
 const { users } = require("../models/user")
+const { createTokenForUser } = require("../services/authentication");
 
 
 router.get("/signin", (req, res) => {
-    return res.render("signin")
+    return res.render("signin", { error: req.query.error })
 });
 
 router.get("/signup", (req, res) => {
@@ -25,27 +26,39 @@ router.post("/signin", async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
         const matchedUsers = await db
             .select({
+                fullName: users.fullName,
                 email: users.email,
                 salt: users.salt,
                 password: users.password,
+                profileImageURL: users.profileImageURL,
+                role: users.role,
             })
             .from(users)
             .where(eq(users.email, normalizedEmail))
             .limit(1);
 
         if (matchedUsers.length === 0) {
-            return res.status(401).send("Invalid email or password");
+            return res.redirect("/user/signin?error=Invalid%20email%20or%20password");
         }
 
         const matchedUser = matchedUsers[0];
         const computedHash = createHmac("sha256", matchedUser.salt).update(password).digest("hex");
 
         if (computedHash !== matchedUser.password) {
-            return res.status(401).send("Invalid email or password");
+            return res.redirect("/user/signin?error=Invalid%20email%20or%20password");
         }
 
         console.log("Signin successful for email:", normalizedEmail);
-        return res.redirect("/");
+        const token = createTokenForUser(matchedUser);
+        console.log("Signin token:", token);
+        return res
+            .cookie("token", token, {
+                httpOnly: true,
+                sameSite: "lax",
+                maxAge: 60 * 60 * 1000,
+                secure: process.env.NODE_ENV === "production",
+            })
+            .redirect("/");
     } catch (error) {
         console.error("Signin failed:", error);
         return res.status(500).send("Unable to sign in right now. Please try again.");
@@ -90,6 +103,17 @@ router.post("/signup", async (req, res) => {
         const errorMessage = error?.message || "Unable to create account right now. Please try again.";
         return res.status(500).send(`Unable to create account: ${errorMessage}`);
     }
+});
+
+
+router.get("/signout", (req, res) => {
+    return res
+        .clearCookie("token", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+        })
+        .redirect("/");
 });
 
 

@@ -6,6 +6,7 @@
 </head>
 <body>
     <%- include('./partials/nav') %>
+    <%= user ? `<h1>Welcome, ${user.full_name || user.email}!</h1>` : '<h1>Welcome to Blogify!</h1>' %>
     <%- include('./partials/scripts') %>
 </body>
 </html>
