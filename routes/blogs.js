@@ -83,6 +83,57 @@ router.post("/add", upload.single("coverImage"), async (req, res) => {
 });
 
 
+router.post("/delete", async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect("/user/signin");
+        }
+
+        if (req.user.role !== "admin") {
+            return res.status(403).send("Forbidden");
+        }
+
+        const { title } = req.body || {};
+        if (!title) {
+            return res.redirect("/");
+        }
+
+        const { eq } = require("drizzle-orm");
+        const { comments } = require("../models/comment");
+
+        const matchedBlog = await db
+            .select({ coverImageURL: blogs.coverImageURL })
+            .from(blogs)
+            .where(eq(blogs.title, title))
+            .limit(1);
+
+        if (!matchedBlog || matchedBlog.length === 0) {
+            return res.redirect("/");
+        }
+
+        await db.delete(comments).where(eq(comments.blogTitle, title));
+        await db.delete(blogs).where(eq(blogs.title, title));
+
+        const coverImageURL = matchedBlog[0].coverImageURL;
+        if (coverImageURL && coverImageURL.startsWith("/uploads/")) {
+            const imagePath = path.resolve("./public", coverImageURL.slice(1));
+            if (fs.existsSync(imagePath)) {
+                try {
+                    fs.unlinkSync(imagePath);
+                } catch (unlinkError) {
+                    console.error("Failed to remove cover image:", unlinkError);
+                }
+            }
+        }
+
+        return res.redirect("/");
+    } catch (error) {
+        console.error("Failed to delete blog:", error);
+        return res.status(500).send("Unable to delete blog right now.");
+    }
+});
+
+
 router.get("/view", async (req, res) => {
     const title = req.query.title;
     if (!title) return res.redirect("/");
@@ -119,10 +170,14 @@ router.get("/view", async (req, res) => {
             blogComments = [];
         }
     }
+    const normalizedComments = (blogComments || []).map((comment) => ({
+        ...comment,
+        timestampValue: comment.timestamp ? new Date(comment.timestamp).toISOString() : "",
+    }));
     return res.render("blog", {
         user: req.user,
         blog,
-        comments: blogComments,
+        comments: normalizedComments,
     });
 });
 
@@ -133,5 +188,8 @@ router.get("/", (req, res) => {
 router.get("/:blogId", async (req, res) => {
     return res.redirect("/");
 });
+
+
+
 
 module.exports = router;

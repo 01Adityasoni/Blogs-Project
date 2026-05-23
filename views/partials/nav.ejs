@@ -16,9 +16,14 @@
           <li class="nav-item">
           <a class="nav-link" href="/blogs/add-new">Add Blog</a>
         </li>
+        <% if (locals.user.role === 'admin') { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/user/manage-users">Manage users</a>
+        </li>
+        <% } %>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <%= locals.user.full_name || locals.user.email %>
+            <%= locals.user.fullName || locals.user.full_name || locals.user.email %>
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/user/signout">Logout</a></li>

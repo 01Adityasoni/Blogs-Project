@@ -27,6 +27,16 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required>
                     </div>
+                    <% if ((typeof canCreateAdmin !== 'undefined' && canCreateAdmin) || (user && user.role === 'admin')) { %>
+                    <div class="mb-4">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role">
+                            <option value="user" selected>User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div class="form-text"><%= (typeof canCreateAdmin !== 'undefined' && canCreateAdmin) ? 'No admin exists yet. You can create the first admin account here.' : 'Only an existing admin can create another admin account.' %></div>
+                    </div>
+                    <% } %>
                     <button type="submit" class="btn btn-primary w-100 py-2">Sign Up</button>
                 </form>
             </div>

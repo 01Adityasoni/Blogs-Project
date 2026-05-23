@@ -16,12 +16,21 @@
                         <div class="col-lg-8">
                             <span class="hero-badge mb-3">Featured read</span>
                             <h1 class="blog-title display-5 mb-3"><%= blog.title %></h1>
-                            <div class="d-flex align-items-center gap-3 mb-4">
-                                <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle avatar-lg" onerror="this.onerror=null;this.src='/user avatar img.png'">
-                                <div>
-                                    <p class="lead mb-0"><%= blog.authorFullName || blog.createdBy %></p>
-                                    <small class="meta-text"><%= blog.createdBy %></small>
+                            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle avatar-lg" onerror="this.onerror=null;this.src='/user avatar img.png'">
+                                    <div>
+                                        <p class="lead mb-0"><%= blog.authorFullName || blog.createdBy %></p>
+                                        <small class="meta-text"><%= blog.createdBy %></small>
+                                    </div>
                                 </div>
+
+                                <% if (user && user.role === 'admin') { %>
+                                    <form action="/blogs/delete" method="POST" onsubmit="return confirm('Delete this blog? This will remove the post and its comments.');">
+                                        <input type="hidden" name="title" value="<%= blog.title %>">
+                                        <button type="submit" class="btn btn-outline-danger px-4 py-2">Delete blog</button>
+                                    </form>
+                                <% } %>
                             </div>
                             <div class="blog-meta fs-6 lh-lg"><%= blog.body %></div>
                         </div>
@@ -43,7 +52,18 @@
                                     <article class="comment-panel mb-3">
                                         <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
                                             <strong><%= c.createdBy %></strong>
-                                            <small class="comment-meta"><%= c.timestamp %></small>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <small class="comment-meta"><%= c.timestamp %></small>
+                                                <% if (user && user.role === 'admin') { %>
+                                                    <form action="/comments/delete" method="POST" class="m-0" onsubmit="return confirm('Delete this comment?');">
+                                                        <input type="hidden" name="blogTitle" value="<%= blog.title %>">
+                                                        <input type="hidden" name="content" value="<%= c.content %>">
+                                                        <input type="hidden" name="createdBy" value="<%= c.createdBy %>">
+                                                        <input type="hidden" name="timestamp" value="<%= c.timestampValue %>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-1">Delete</button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
                                         </div>
                                         <div class="blog-meta"><%= c.content %></div>
                                     </article>
