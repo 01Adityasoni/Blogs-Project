@@ -25,12 +25,18 @@
                                     </div>
                                 </div>
 
-                                <% if (user && user.role === 'admin') { %>
-                                    <form action="/blogs/delete" method="POST" onsubmit="return confirm('Delete this blog? This will remove the post and its comments.');">
-                                        <input type="hidden" name="title" value="<%= blog.title %>">
-                                        <button type="submit" class="btn btn-outline-danger px-4 py-2">Delete blog</button>
-                                    </form>
-                                <% } %>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <% if (user && user.email === blog.createdBy) { %>
+                                        <a href="/blogs/edit?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-outline-light px-4 py-2">Edit blog</a>
+                                    <% } %>
+
+                                    <% if (user && user.role === 'admin') { %>
+                                        <form action="/blogs/delete" method="POST" onsubmit="return confirm('Delete this blog? This will remove the post and its comments.');">
+                                            <input type="hidden" name="title" value="<%= blog.title %>">
+                                            <button type="submit" class="btn btn-outline-danger px-4 py-2">Delete blog</button>
+                                        </form>
+                                    <% } %>
+                                </div>
                             </div>
                             <div class="blog-meta fs-6 lh-lg"><%= blog.body %></div>
                         </div>

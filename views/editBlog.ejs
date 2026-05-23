@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head') %>
+    <title>Edit Blog</title>
+</head>
+<body>
+    <div class="app-shell">
+    <%- include('./partials/nav') %>
+    <main class="page-shell">
+        <div class="container">
+            <div class="form-panel mx-auto" style="max-width: 860px;">
+                <div class="page-heading">
+                    <span class="hero-badge mb-3">Edit post</span>
+                    <h1 class="section-title h2 mb-2">Update your blog</h1>
+                    <p class="section-copy mb-0">Only the original author can change this post.</p>
+                </div>
+
+                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                    <div class="alert alert-danger" role="alert"><%= errorMessage %></div>
+                <% } %>
+
+                <div class="mb-4 d-flex align-items-center gap-3">
+                    <img src="<%= blog.authorProfileImageURL || '/user avatar img.png' %>" alt="author avatar" class="rounded-circle avatar-sm" onerror="this.onerror=null;this.src='/user avatar img.png'">
+                    <div>
+                        <div class="fw-semibold"><%= blog.authorFullName || blog.createdBy %></div>
+                        <small class="meta-text"><%= blog.createdBy %></small>
+                    </div>
+                </div>
+
+                <form action="/blogs/update" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="oldTitle" value="<%= blog.title %>">
+                    <div class="mb-3">
+                        <label for="coverImage" class="form-label">Cover Image</label>
+                        <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*">
+                        <div class="form-text">Leave blank to keep the current cover image.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current cover</label>
+                        <div>
+                            <img src="<%= blog.resolvedCoverImageURL || '/cover-placeholder.svg' %>" alt="current cover" class="img-fluid rounded-4" style="max-height: 240px; object-fit: cover;" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" value="<%= blog.title %>" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="8" required><%= blog.body %></textarea>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2">Save changes</button>
+                        <a href="/blogs/view?title=<%= encodeURIComponent(blog.title) %>" class="btn btn-outline-light px-4 py-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    </div>
+    <%- include('./partials/scripts') %>
+</body>
+</html>

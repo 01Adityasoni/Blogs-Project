@@ -83,6 +83,141 @@ router.post("/add", upload.single("coverImage"), async (req, res) => {
 });
 
 
+router.get("/edit", async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect("/user/signin");
+        }
+
+        const title = req.query.title;
+        if (!title) {
+            return res.redirect("/");
+        }
+
+        const { eq } = require("drizzle-orm");
+        const { comments } = require("../models/comment");
+
+        const matched = await db
+            .select({
+                title: blogs.title,
+                body: blogs.body,
+                createdBy: blogs.createdBy,
+                coverImageURL: blogs.coverImageURL,
+                timestamp: blogs.timestamp,
+                authorFullName: users.fullName,
+                authorProfileImageURL: users.profileImageURL,
+            })
+            .from(blogs)
+            .innerJoin(users, eq(blogs.createdBy, users.email))
+            .where(eq(blogs.title, title))
+            .limit(1);
+
+        if (!matched || matched.length === 0) {
+            return res.redirect("/");
+        }
+
+        const blog = {
+            ...matched[0],
+            resolvedCoverImageURL: resolveCoverImageURL(matched[0].coverImageURL),
+        };
+
+        if (req.user.email !== blog.createdBy) {
+            return res.status(403).send("Forbidden");
+        }
+
+        return res.render("editBlog", {
+            user: req.user,
+            blog,
+            errorMessage: req.query.error || "",
+        });
+    } catch (error) {
+        console.error("Failed to load blog edit page:", error);
+        return res.status(500).send("Unable to load blog editor right now.");
+    }
+});
+
+
+router.post("/update", upload.single("coverImage"), async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect("/user/signin");
+        }
+
+        const { oldTitle, title, content } = req.body || {};
+        if (!oldTitle || !title || !content) {
+            return res.redirect("/blogs/edit?title=" + encodeURIComponent(oldTitle || "") + "&error=" + encodeURIComponent("Title and content are required."));
+        }
+
+        const { eq } = require("drizzle-orm");
+        const { comments } = require("../models/comment");
+
+        const matchedBlog = await db
+            .select({
+                title: blogs.title,
+                createdBy: blogs.createdBy,
+                coverImageURL: blogs.coverImageURL,
+            })
+            .from(blogs)
+            .where(eq(blogs.title, oldTitle))
+            .limit(1);
+
+        if (!matchedBlog || matchedBlog.length === 0) {
+            return res.redirect("/");
+        }
+
+        const existingBlog = matchedBlog[0];
+        if (req.user.email !== existingBlog.createdBy) {
+            return res.status(403).send("Forbidden");
+        }
+
+        if (req.file && !req.file.mimetype.startsWith("image/")) {
+            try {
+                fs.unlinkSync(req.file.path);
+            } catch (unlinkError) {
+                console.error("Failed to remove non-image upload:", unlinkError);
+            }
+            return res.redirect("/blogs/edit?title=" + encodeURIComponent(oldTitle) + "&error=" + encodeURIComponent("Please upload an image file for the cover image."));
+        }
+
+        const coverImageURL = req.file ? `/uploads/${req.file.filename}` : existingBlog.coverImageURL;
+        const nextTitle = title.trim();
+        const nextContent = content.trim();
+
+        await db
+            .update(blogs)
+            .set({
+                title: nextTitle,
+                body: nextContent,
+                ...(req.file ? { coverImageURL } : {}),
+            })
+            .where(eq(blogs.title, oldTitle));
+
+        if (oldTitle !== nextTitle) {
+            await db
+                .update(comments)
+                .set({ blogTitle: nextTitle })
+                .where(eq(comments.blogTitle, oldTitle));
+        }
+
+        if (req.file && existingBlog.coverImageURL && existingBlog.coverImageURL.startsWith("/uploads/")) {
+            const oldImagePath = path.resolve("./public", existingBlog.coverImageURL.slice(1));
+            if (fs.existsSync(oldImagePath)) {
+                try {
+                    fs.unlinkSync(oldImagePath);
+                } catch (unlinkError) {
+                    console.error("Failed to remove previous cover image:", unlinkError);
+                }
+            }
+        }
+
+        return res.redirect(`/blogs/view?title=${encodeURIComponent(nextTitle)}`);
+    } catch (error) {
+        console.error("Failed to update blog:", error);
+        return res.status(500).send("Unable to update blog right now.");
+    }
+});
+
+
 router.post("/delete", async (req, res) => {
     try {
         if (!req.user) {
