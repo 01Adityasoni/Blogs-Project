@@ -52,7 +52,7 @@
                             </div>
 
                             <% if (blogs && blogs.length) { %>
-                                <img src="<%= blogs[0].resolvedCoverImageURL || blogs[0].coverImageURL || '/cover-placeholder.svg' %>" class="spotlight-cover w-100" alt="featured cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
+                                <img src="<%= blogs[0].coverImageURL || blogs[0].resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="spotlight-cover w-100" alt="featured cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
                                 <div>
                                     <h2 class="blog-title h3 mb-2"><%= blogs[0].title %></h2>
                                     <p class="spotlight-copy mb-3"><%= (blogs[0].body && blogs[0].body.length > 150) ? blogs[0].body.substring(0,150) + '...' : blogs[0].body %></p>
@@ -84,7 +84,7 @@
                     <% blogs.forEach(function(blog){ %>
                         <div class="col-md-6 col-xl-4">
                             <article class="blog-card">
-                                <img src="<%= blog.resolvedCoverImageURL || blog.coverImageURL || '/cover-placeholder.svg' %>" class="card-img-top blog-cover" alt="cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
+                                <img src="<%= blog.coverImageURL || blog.resolvedCoverImageURL || '/cover-placeholder.svg' %>" class="card-img-top blog-cover" alt="cover" onerror="this.onerror=null;this.src='/cover-placeholder.svg'">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
                                         <span class="section-badge">Article</span>

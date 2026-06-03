@@ -1,12 +1,13 @@
 require("dotenv/config");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const { drizzle } = require("drizzle-orm/node-postgres");
 const { migrate } = require("drizzle-orm/node-postgres/migrator");
 const { Pool } = require("pg");
-const { normalizeDatabaseUrl } = require("./db/connection");
 
 const pool = new Pool({
-  connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL),
+  connectionString: process.env.DATABASE_URL,
 });
 
 const db = drizzle(pool);
