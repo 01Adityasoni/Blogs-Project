@@ -1,5 +1,6 @@
 require("dotenv/config");
 const { defineConfig } = require("drizzle-kit");
+const { normalizeDatabaseUrl } = require("./db/connection");
 
 module.exports = defineConfig({
   schema: [
@@ -12,6 +13,6 @@ module.exports = defineConfig({
   dialect: "postgresql",
 
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: normalizeDatabaseUrl(process.env.DATABASE_URL),
   },
 });
